@@ -1,0 +1,14 @@
+Start Simulator Configuration File
+Version/Phase: 2.0
+File Path: Test_1a.mdf
+Monitor display time {msec}: 25
+Processor cycle time {msec}: 12
+Scanner cycle time {msec}: 28
+Hard drive cycle time {msec}: 17
+Keyboard cycle time {msec}: 52
+Memory cycle time {msec}: 31
+Projector cycle time {msec}: 14
+System memory {Gbytes}: 2
+Log: Log to File
+Log File Path: logfile_2.lgf
+End Simulator Configuration File

@@ -1,0 +1,66 @@
+Configuration File Data
+Monitor = 25 ms/cycle
+Processor = 12 ms/cycle
+Scanner = 28 ms/cycle
+Hard Drive = 17 ms/cycle
+Keyboard = 52 ms/cycle
+Memory = 31 ms/cycle
+Projector = 14 ms/cycle
+System Memory = 2000000 kbytes
+Logged to: logfile_2.lgf
+
+Meta-Data Metrics
+P{run}11 - 132 ms
+M{allocate}2 - 62 ms
+O{monitor}7 - 175 ms
+I{hard drive}8 - 136 ms
+I{scanner}8 - 224 ms
+O{projector}20 - 280 ms
+P{run}6 - 72 ms
+O{projector}4 - 56 ms
+M{block}6 - 186 ms
+I{keyboard}17 - 884 ms
+M{block}4 - 124 ms
+O{projector}8 - 112 ms
+P{run}5 - 60 ms
+P{run}5 - 60 ms
+O{hard drive}6 - 102 ms
+P{run}18 - 216 ms
+
+0.000000 - Simulator program starting
+0.000007 - OS: preparing process 2
+0.000014 - OS: starting process 2
+0.000022 - Process 2: start processing action
+0.132219 - Process 2: end processing action
+0.132278 - Process 2: allocating memory
+0.194440 - Process 2: memory allocated at 0x6fceb645
+0.194509 - Process 2: start monitor output
+0.369596 - Process 2: end monitor output
+0.369662 - Process 2: start hard drive input
+0.505924 - Process 2: end hard drive input
+0.505984 - Process 2: start scanner input
+0.730199 - Process 2: end scanner input
+0.730272 - Process 2: start projector output
+1.010671 - Process 2: end projector output
+1.010729 - Process 2: start processing action
+1.082785 - Process 2: end processing action
+1.082840 - Process 2: start projector output
+1.139165 - Process 2: end projector output
+1.139205 - Process 2: start memory blocking
+1.325291 - Process 2: end memory blocking
+1.325347 - Process 2: start keyboard input
+2.209655 - Process 2: end keyboard input
+2.210120 - Process 2: start memory blocking
+2.334180 - Process 2: end memory blocking
+2.334236 - Process 2: start projector output
+2.446564 - Process 2: end projector output
+2.446627 - Process 2: start processing action
+2.506771 - Process 2: end processing action
+2.506800 - Process 2: start processing action
+2.566845 - Process 2: end processing action
+2.566878 - Process 2: start hard drive output
+2.669162 - Process 2: end hard drive output
+2.669196 - Process 2: start processing action
+2.885243 - Process 2: end processing action
+2.885284 - OS: removing process 2
+2.885295 - Simulator program ending

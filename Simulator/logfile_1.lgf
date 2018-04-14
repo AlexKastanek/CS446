@@ -1,84 +1,44 @@
 Configuration File Data
-Monitor = 20 ms/cycle
-Processor = 10 ms/cycle
-Scanner = 25 ms/cycle
-Hard Drive = 15 ms/cycle
-Keyboard = 50 ms/cycle
-Memory = 30 ms/cycle
-Projector = 10 ms/cycle
+Processor Quantum Number = 1
+CPU Scheduling Code = PS
+Monitor = 22 ms/cycle
+Processor = 5 ms/cycle
+Scanner = 30 ms/cycle
+Hard Drive = 150 ms/cycle
+Keyboard = 60 ms/cycle
+Memory = 10 ms/cycle
+Projector = 550 ms/cycle
 System Memory = 2048 kbytes
-Memory Block Size = 256 kbytes
+Memory Block Size = 128 kbytes
 Projector Quantity = 4
 Hard Drive Quantity = 2
 Logged to: monitor and logfile_1.lgf
 
 Meta-Data Metrics
-P{run}11 - 110 ms
-M{allocate}2 - 60 ms
-O{monitor}7 - 140 ms
-I{hard drive}8 - 120 ms
-O{projector}20 - 200 ms
-M{allocate}4 - 120 ms
-O{projector}6 - 60 ms
-M{allocate}3 - 90 ms
-I{hard drive}7 - 105 ms
-O{hard drive}2 - 30 ms
-O{hard drive}16 - 240 ms
-M{allocate}4 - 120 ms
-P{run}6 - 60 ms
-O{projector}4 - 40 ms
-M{block}6 - 180 ms
-I{keyboard}17 - 850 ms
-M{block}4 - 120 ms
-P{run}5 - 50 ms
-P{run}5 - 50 ms
-O{hard drive}6 - 90 ms
-P{run}18 - 180 ms
+P{run}11 - 55 ms
+M{allocate}2 - 20 ms
+O{hard drive}6 - 900 ms
+P{run}4 - 20 ms
+I{keyboard}18 - 1080 ms
+M{allocate}4 - 40 ms
+P{run}6 - 30 ms
 
 0.000002 - Simulator program starting
-0.000120 - OS: preparing process 1
-0.000152 - OS: starting process 1
-0.000191 - Process 1: start processing action
-0.110602 - Process 1: end processing action
-0.110670 - Process 1: allocating memory
-0.170753 - Process 1: memory allocated at 0x00000000
-0.170834 - Process 1: start monitor output
-0.311243 - Process 1: end monitor output
-0.311340 - Process 1: start hard drive input on HDD 0
-0.431522 - Process 1: end hard drive input
-0.431640 - Process 1: start projector output on PROJ 0
-0.631984 - Process 1: end projector output
-0.632062 - Process 1: allocating memory
-0.752176 - Process 1: memory allocated at 0x00000100
-0.752334 - Process 1: start projector output on PROJ 1
-0.812774 - Process 1: end projector output
-0.812901 - Process 1: allocating memory
-0.903027 - Process 1: memory allocated at 0x00000200
-0.903123 - Process 1: start hard drive input on HDD 1
-1.009598 - Process 1: end hard drive input
-1.009713 - Process 1: start hard drive output on HDD 0
-1.039932 - Process 1: end hard drive output
-1.040018 - Process 1: start hard drive output on HDD 1
-1.280213 - Process 1: end hard drive output
-1.280358 - Process 1: allocating memory
-1.400482 - Process 1: memory allocated at 0x00000300
-1.400573 - Process 1: start processing action
-1.460654 - Process 1: end processing action
-1.460695 - Process 1: start projector output on PROJ 2
-1.500850 - Process 1: end projector output
-1.500978 - Process 1: start memory blocking
-1.681161 - Process 1: end memory blocking
-1.681249 - Process 1: start keyboard input
-2.531688 - Process 1: end keyboard input
-2.531890 - Process 1: start memory blocking
-2.652103 - Process 1: end memory blocking
-2.652176 - Process 1: start processing action
-2.702341 - Process 1: end processing action
-2.702410 - Process 1: start processing action
-2.752668 - Process 1: end processing action
-2.752734 - Process 1: start hard drive output on HDD 0
-2.843036 - Process 1: end hard drive output
-2.843115 - Process 1: start processing action
-3.023184 - Process 1: end processing action
-3.023278 - OS: removing process 1
-3.023311 - Simulator program ending
+0.000102 - OS: preparing process 1
+0.000133 - OS: starting process 1
+0.000165 - Process 1: start processing action
+0.055427 - Process 1: end processing action
+0.055501 - Process 1: allocating memory
+0.075683 - Process 1: memory allocated at 0x00000000
+0.075759 - Process 1: start hard drive output on HDD 0
+0.975973 - Process 1: end hard drive output
+0.976115 - Process 1: start processing action
+0.996280 - Process 1: end processing action
+0.996358 - Process 1: start keyboard input
+2.076463 - Process 1: end keyboard input
+2.076593 - Process 1: allocating memory
+2.116687 - Process 1: memory allocated at 0x00000080
+2.116771 - Process 1: start processing action
+2.146971 - Process 1: end processing action
+2.147063 - OS: removing process 1
+2.147121 - Simulator program ending

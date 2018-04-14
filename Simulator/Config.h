@@ -36,6 +36,8 @@ class Config
 		int getComponentTime(char, string);
 		
 		int getLogType();
+		int getProcessorQuantumNumber();
+		int getCpuScheduleCode();
 		int getProjectorTime();
 		int getProcessorTime();
 		int getKeyboardTime();
@@ -52,6 +54,8 @@ class Config
 		string getLogPath();
 		
 		void setLogType(int);
+		void setProcessorQuantumNumber(int);
+		void setCpuScheduleCode(int);
 		void setProjectorTime(int);
 		void setProcessorTime(int);
 		void setKeyboardTime(int);
@@ -77,7 +81,7 @@ class Config
 		string keywordDatabase[7] = {"Monitor", "Processor", "Scanner", "Hard",
 									 "Keyboard", "Memory", "Projector"};
 	
-		int logType;
+		int logType, processorQuantumNumber, cpuScheduleCode;
 		
 		//processor cycle times, all inputs in msec
 		int projectorTime, processorTime, keyboardTime, monitorTime,

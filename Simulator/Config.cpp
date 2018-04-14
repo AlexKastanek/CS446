@@ -78,6 +78,79 @@ void Config::getConfigData(ifstream& fin)
 	word.clear();
 	fin >> filePath;
 	
+	//line 4 error check and data collection
+	fin >> word;
+	if (word != "Processor")
+	{
+		cout << "ERROR: typo on line 4" << endl;
+		return;
+	}
+	word.clear();
+	fin >> word;
+	if (word != "Quantum")
+	{
+		cout << "ERROR: typo on line 4" << endl;
+		return;
+	}
+	word.clear();
+	fin >> word;
+	if (word != "Number:")
+	{
+		cout << "ERROR: typo on line 4" << endl;
+		return;
+	}
+	word.clear();
+	int parsedPQN;
+	fin >> word;
+	parsedPQN = atoi(word.c_str());
+	//implement a validity check here when PQN is used
+	processorQuantumNumber = parsedPQN;
+	word.clear();
+	getline(fin, line);
+	
+	//line 5 error check and data collection
+	fin >> word;
+	if (word != "CPU")
+	{
+		cout << "ERROR: typo on line 5" << endl;
+		return;
+	}
+	word.clear();
+	fin >> word;
+	if (word != "Scheduling")
+	{
+		cout << "ERROR: typo on line 5" << endl;
+		return;
+	}
+	word.clear();
+	fin >> word;
+	if (word != "Code:")
+	{
+		cout << "ERROR: typo on line 5" << endl;
+		return;
+	}
+	word.clear();
+	fin >> word;
+	if (word == "FIFO")
+	{
+		cpuScheduleCode = 0;
+	}
+	else if (word == "PS")
+	{
+		cpuScheduleCode = 1;
+	}
+	else if (word == "SJF")
+	{
+		cpuScheduleCode = 2;
+	}
+	else
+	{
+		cout << "ERROR: invalid code on line 5" << endl;
+		return;
+	}
+	word.clear();
+	getline(fin, line);
+	
 	//device cycle times error check and data collection
 	//my implementation allows for the device times to be listed in any order so long as
 	//they follow the correct format and there does not exist a time that is less than or
@@ -95,7 +168,7 @@ void Config::getConfigData(ifstream& fin)
 		//will return 0
 		if (keywordIndex == 0)
 		{
-			cout << "ERROR: typo on line " << i + 4 << endl;
+			cout << "ERROR: typo on line " << i + 6 << endl;
 			return;
 		}
 		
@@ -186,17 +259,17 @@ void Config::getConfigData(ifstream& fin)
 	}
 	word.clear();
 	
-	//line 11 error check and data collection
+	//line 13 error check and data collection
 	fin >> word;
 	if (word != "System")
 	{
-		cout << "ERROR: typo on line 11" << endl;
+		cout << "ERROR: typo on line 13" << endl;
 		return;
 	}
 	fin >> word;
 	if (word != "memory")
 	{
-		cout << "ERROR: typo on line 11" << endl;
+		cout << "ERROR: typo on line 13" << endl;
 		return;
 	}
 	char dataConvType = 'k';
@@ -215,7 +288,7 @@ void Config::getConfigData(ifstream& fin)
 	}
 	else
 	{
-		cout << "ERROR: typo on line 11" << endl;
+		cout << "ERROR: typo on line 13" << endl;
 		return;
 	}
 	word.clear();
@@ -231,25 +304,25 @@ void Config::getConfigData(ifstream& fin)
 	systemMemory = convertToKilobytes(parsedSystemMemory, dataConvType);
 	getline(fin, line);
 	
-	//line 12 error check and data collection
+	//line 14 error check and data collection
 	fin >> word;
 	if (word != "Memory")
 	{
-		cout << "ERROR: typo on line 12" << endl;
+		cout << "ERROR: typo on line 14" << endl;
 		return;
 	}
 	word.clear();
 	fin >> word;
 	if (word != "block")
 	{
-		cout << "ERROR: typo on line 12" << endl;
+		cout << "ERROR: typo on line 14" << endl;
 		return;
 	}
 	word.clear();
 	fin >> word;
 	if (word != "size")
 	{
-		cout << "ERROR: typo on line 12" << endl;
+		cout << "ERROR: typo on line 14" << endl;
 		return;
 	}
 	fin >> word;
@@ -267,7 +340,7 @@ void Config::getConfigData(ifstream& fin)
 	}
 	else
 	{
-		cout << "ERROR: typo on line 12" << endl;
+		cout << "ERROR: typo on line 14" << endl;
 		return;
 	}
 	word.clear();
@@ -289,17 +362,17 @@ void Config::getConfigData(ifstream& fin)
 	blockSize = tempBlockSize;
 	getline(fin, line);
 	
-	//line 13 error check and data collection
+	//line 15 error check and data collection
 	fin >> word;
 	if (word != "Projector")
 	{
-		cout << "ERROR: typo on line 13" << endl;
+		cout << "ERROR: typo on line 15" << endl;
 		return;
 	}
 	fin >> word;
 	if (word != "quantity:")
 	{
-		cout << "ERROR: typo on line 13" << endl;
+		cout << "ERROR: typo on line 15" << endl;
 		return;
 	}
 	word.clear();
@@ -313,24 +386,24 @@ void Config::getConfigData(ifstream& fin)
 	projQuant = parsedProjQuant;
 	getline(fin, line);
 	
-	//line 14 error check and data collection
+	//line 16 error check and data collection
 	word.clear();
 	fin >> word;
 	if (word != "Hard")
 	{
-		cout << "ERROR: typo on line 14" << endl;
+		cout << "ERROR: typo on line 16" << endl;
 		return;
 	}
 	fin >> word;
 	if (word != "drive")
 	{
-		cout << "ERROR: typo on line 14" << endl;
+		cout << "ERROR: typo on line 16" << endl;
 		return;
 	}
 	fin >> word;
 	if (word != "quantity:")
 	{
-		cout << "ERROR: typo on line 14" << endl;
+		cout << "ERROR: typo on line 16" << endl;
 		return;
 	}
 	word.clear();
@@ -344,7 +417,7 @@ void Config::getConfigData(ifstream& fin)
 	hddQuant = parsedHddQuant;
 	getline(fin, line);
 	
-	//line 15 error check and data collection
+	//line 17 error check and data collection
 	getline(fin, line);
 	if (line == "Log: Log to Monitor")
 	{
@@ -360,40 +433,40 @@ void Config::getConfigData(ifstream& fin)
 	}
 	else
 	{
-		cout << "ERROR: Typo on line 15" << endl;
+		cout << "ERROR: Typo on line 17" << endl;
 		return;
 	}
 	line.clear();
 	
-	//line 16 error check and data collection
+	//line 18 error check and data collection
 	word.clear();
 	fin >> word;
 	if (word != "Log")
 	{
-		cout << "ERROR: Typo on line 16" << endl;
+		cout << "ERROR: Typo on line 18" << endl;
 		return;
 	}
 	fin >> word;
 	if (word != "File")
 	{
-		cout << "ERROR: Typo on line 16" << endl;
+		cout << "ERROR: Typo on line 18" << endl;
 		return;
 	}
 	fin >> word;
 	if (word != "Path:")
 	{
-		cout << "ERROR: Typo on line 16" << endl;
+		cout << "ERROR: Typo on line 18" << endl;
 		return;
 	}
 	word.clear();
 	fin >> logPath;
 	
-	//line 17 error check
+	//line 19 error check
 	getline(fin, line); //eliminating rest of current line
 	getline(fin, line);
 	if (line != "End Simulator Configuration File")
 	{
-		cout << "ERROR: Typo on line 17" << endl;
+		cout << "ERROR: Typo on line 19" << endl;
 		return;
 	}
 	line.clear();
@@ -450,21 +523,21 @@ bool Config::parseComponentTime(string word, string typeOfConstString, int curre
 		//checking if the length of the time is too short or long
 		//less than one character is too short, and I am assuming that larger than 3 
 		//characters would be too big
-		cout << "ERROR: invalid time on line " << currentLine + 4 << endl;
+		cout << "ERROR: invalid time on line " << currentLine + 6 << endl;
 		return 0;
 	}
 	string time = word.substr(begLocation, timeLength); //parsed string
 	string rest = word.substr(0, begLocation - 1); //rest of string
 	if (rest != typeOfConstString) //checking for typos in rest of string
 	{
-		cout << "ERROR: typo on line " << currentLine + 4 << endl;
+		cout << "ERROR: typo on line " << currentLine + 6 << endl;
 		return 0;
 	}
 	int parsedTime = atoi(time.c_str()); //converting cycle time string to int
 	if (parsedTime <= 0)
 	{
 		//checking if time is negative or equal to zero
-		cout << "ERROR: invalid time on line " << currentLine + 4 << endl;
+		cout << "ERROR: invalid time on line " << currentLine + 6 << endl;
 		return 0;
 	}
 	componentTime = parsedTime; //setting componentTime
@@ -544,6 +617,26 @@ int Config::getComponentTime(char code, string descriptor)
 int Config::getLogType()
 {
 	return logType;
+}
+
+/**
+*	Function: getProcessorQuantumNumber
+*	Description: returns the processor quantum number specified in the configuration
+*				 file
+*/
+int Config::getProcessorQuantumNumber()
+{
+	return processorQuantumNumber;
+}
+
+/**
+*	Function: getCpuScheduleCode
+*	Description: returns the cpu schedule code specified in the configuration
+*				 file
+*/
+int Config::getCpuScheduleCode()
+{
+	return cpuScheduleCode;
 }
 
 /**
@@ -681,6 +774,24 @@ string Config::getLogPath()
 void Config::setLogType(int source)
 {
 	logType = source;
+}
+
+/**
+*	Function: setProcessorQuantumNumber
+*	Description: sets the processor quantum number to the parameter: source
+*/
+void Config::setProcessorQuantumNumber(int source)
+{
+	processorQuantumNumber = source;
+}
+
+/**
+*	Function: setCpuScheduleCode
+*	Description: sets the cpu schedule code to the parameter: source
+*/
+void Config::setCpuScheduleCode(int source)
+{
+	cpuScheduleCode = source;
 }
 
 /**

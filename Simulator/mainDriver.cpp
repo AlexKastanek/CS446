@@ -12,6 +12,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <vector>
 #include <deque>
 #include <string>
 #include <pthread.h>
@@ -38,6 +39,7 @@ pthread_mutex_t mutexProjector;
 
 bool getMetaData(ifstream&, Config, deque<MetaData>&);
 
+bool prepProgram(Config, deque<MetaData>, deque<deque<MetaData>>&);
 bool runProgram(Config, deque<MetaData>, int);
 bool handleProcess(Config, MetaData, PCB&);
 bool systemHandler(PCB&, string);
@@ -46,6 +48,8 @@ bool processorHandler(PCB&, int);
 bool memoryHandler(PCB&, Config, string, int);
 bool inputHandler(PCB&, string, int);
 bool outputHandler(PCB&, string, int);
+
+void prioritySchedule(vector<deque<MetaData>>, deque<deque<MetaData>>&);
 
 unsigned int generateMemoryAddress();
 int allocateMemory(PCB&, Config);
@@ -103,6 +107,9 @@ int main(int argc, char *argv[])
 	
 	for (int i = 0; i < argc - 1; i++)
 	{
+		deque<deque<MetaData>> processQueue; //used to store each process in order of
+										     //execution
+	
 		string metaDataFile; //used to store the filename of the meta data file
 		bool okToContinue; //used to stop the program if error ocurred
 	
@@ -135,6 +142,17 @@ int main(int argc, char *argv[])
 		else
 		{
 			//cout << "ERROR: Meta-Data could not be stored" << endl;
+			return -1;
+		}
+		
+		//if ok to continue, call prepProgram(configData[i], instructionSet[i])
+		if (okToContinue)
+		{
+			okToContinue = prepProgram(configData[i], instructionSet[i], 
+									   processQueue);
+		}
+		else
+		{
 			return -1;
 		}
 		
@@ -244,6 +262,122 @@ bool getMetaData(ifstream& fin, Config configData, deque<MetaData>& instructionS
 	line.clear();
 	
 	return 1;
+
+}
+
+bool prepProgram(Config configData, deque<MetaData> instructionSet,
+				 deque<deque<MetaData>>& program)
+{
+
+	vector<deque<MetaData>> processStorage;
+	vector<int> processIndeces;
+	int processCount = 0;
+	
+	//determine the indeces of the beginning of each process 
+	//and the amount of processes
+	for (int i = 0; i < instructionSet.size(); i++)
+	{
+		if (instructionSet[i].getCode() == 'A' && 
+			instructionSet[i].getDescriptor() == "begin")
+		{
+			processIndeces.push_back(i);
+			processCount++;
+		}
+	}
+	
+	/*for (int i = 0; i < processIndeces.size(); i++)
+	{
+		cout << processIndeces[i] << endl;
+	}
+	cout << "total processes: " << processCount << endl;*/
+	
+	//use indeces to separate processes into individual deques
+	//store deques in a vector
+	deque<MetaData> processes[processCount];
+	for (int i = 0; i < processCount; i++)
+	{
+		if (i == processCount - 1)
+		{
+			for (int j = processIndeces[i]; j < instructionSet.size(); j++)
+			{
+				if (instructionSet[j].getCode() != 'S' && 
+					instructionSet[j].getCode() != 'A')
+				{
+					processes[i].push_back(instructionSet[j]);
+				}
+			}
+		}
+		else
+		{
+			for (int j = processIndeces[i]; j < processIndeces[i + 1] + 1; j++)
+			{
+				if (instructionSet[j].getCode() != 'S' && 
+					instructionSet[j].getCode() != 'A')
+				{
+					processes[i].push_back(instructionSet[j]);
+				}
+			}
+		}
+		
+		processStorage.push_back(processes[i]);
+	}
+	
+	//to ensure consistency, adding meta data start and finish commands for system
+	//and application to the queues
+	MetaData systemBegin, systemFinish, appBegin, appFinish;
+	systemBegin.setData('S', "begin", 0, 0);
+	systemFinish.setData('S', "finish", 0, 0);
+	appBegin.setData('A', "begin", 0, 0);
+	appFinish.setData('A', "finish", 0, 0);
+	for (int i = 0; i < processStorage.size(); i++)
+	{
+		processStorage[i].push_front(appBegin);
+		processStorage[i].push_back(appFinish);
+		if (i == 0)
+		{
+			processStorage[i].push_front(systemBegin);
+		}
+		if (i == processStorage.size() - 1)
+		{
+			processStorage[i].push_back(systemFinish);
+		}
+	}
+	
+	/*cout << processStorage.size() << endl;
+	for (int i = 0; i < processStorage.size(); i++)
+	{
+		cout << "process " << i << "(size " << processStorage[i].size() << ") - ";
+		for (int j = 0; j < processStorage[i].size(); j++)
+		{
+			processStorage[i][j].print();
+			cout << "; ";
+		}
+		cout << endl;
+	}*/
+	
+	//call scheduling algorithm to resort vector of processes into a deque
+	if (configData.getCpuScheduleCode() == 0)
+	{
+		//FIFO - no need to resort anything
+		for (int i = 0; i < processStorage.size(); i++)
+		{
+			program.push_back(processStorage[i]);
+		}
+	}
+	else if (configData.getCpuScheduleCode() == 1)
+	{
+		//PS
+		prioritySchedule(processStorage, program);
+	}
+	else if (configData.getCpuScheduleCode() == 2)
+	{
+		//SJF
+	}
+	else
+	{
+		cout << "ERROR: incorrect cpu scheduling code recorded" << endl;
+		return 0;
+	}
 
 }
 
@@ -1093,6 +1227,61 @@ bool outputHandler(PCB& pData, string descriptor, int processTime)
 
 }
 
+void prioritySchedule(vector<deque<MetaData>> processStorage, deque<deque<MetaData>>& 
+					  program)
+{
+
+	int processIOCounters[processStorage.size()];
+
+	//count io operations in each process and store in an array
+	for (int i = 0; i < processStorage.size(); i++)
+	{
+		processIOCounters[i] = 0;
+		for (int j = 0; j < processStorage[i].size(); j++)
+		{
+			if (processStorage[i][j].getCode() == 'I' || 
+				processStorage[i][j].getCode() == 'O')
+			{
+				processIOCounters[i]++;
+			}
+		}
+	}
+	
+	/*for (int i = 0; i < processStorage.size(); i++)
+	{
+		cout << processIOCounters[i] << ", ";
+	}
+	cout << endl;*/
+	
+	bool sorted = true;
+	int largestIOValue, largestIOIndex = 0;
+	for (int i = 0; i < processStorage.size(); i++)
+	{
+		largestIOValue = -1;
+		for (int j = 0; j < processStorage.size(); j++)
+		{
+			if (processIOCounters[j] > largestIOValue)
+			{
+				largestIOValue = processIOCounters[j];
+				largestIOIndex = j;
+			}
+		}
+		program.push_back(processStorage[largestIOIndex]);
+		processIOCounters[largestIOIndex] = -1;
+	}
+	
+	for (int i = 0; i < program.size(); i++)
+	{
+		for (int j = 0; j < program[i].size(); j++)
+		{
+			program[i][j].print();
+		}
+		cout << endl;
+	}
+	cout << endl;
+
+}
+
 /**
 *	Function: generateMemoryAddress
 *	Description: Generates a random unsigned int to be used as a memory address 
@@ -1378,9 +1567,32 @@ void output(Config configData, deque<MetaData> metaData)
 */
 void outputToMonitor(Config configData, deque<MetaData> metaData)
 {
+	
+	string scheduleType;
+	if (configData.getCpuScheduleCode() == 0)
+	{
+		scheduleType = "FIFO";
+	}
+	else if (configData.getCpuScheduleCode() == 1)
+	{
+		scheduleType = "PS";
+	}
+	else if (configData.getCpuScheduleCode() == 2)
+	{
+		scheduleType = "SJ";
+	}
+	else
+	{
+		cout << "ERROR: using incorrect CPU scheduling code" << endl;
+		return;
+	}
+
 	//Config Output
 	cout << endl;
 	cout << "Configuration File Data" << endl;
+	cout << "Processor Quantum Number = " << configData.getProcessorQuantumNumber()
+		 << endl;
+	cout << "CPU Scheduling Code = " << scheduleType << endl;
 	cout << "Monitor = " << configData.getMonitorTime() << " ms/cycle" << endl;
 	cout << "Processor = " << configData.getProcessorTime() << " ms/cycle" << endl;
 	cout << "Scanner = " << configData.getScannerTime() << " ms/cycle" << endl;
@@ -1437,11 +1649,34 @@ void outputToMonitor(Config configData, deque<MetaData> metaData)
 */
 void outputToFile(Config configData, deque<MetaData> metaData)
 {
+
+	string scheduleType;
+	if (configData.getCpuScheduleCode() == 0)
+	{
+		scheduleType = "FIFO";
+	}
+	else if (configData.getCpuScheduleCode() == 1)
+	{
+		scheduleType = "PS";
+	}
+	else if (configData.getCpuScheduleCode() == 2)
+	{
+		scheduleType = "SJ";
+	}
+	else
+	{
+		cout << "ERROR: using incorrect CPU scheduling code" << endl;
+		return;
+	}
+	
 	//ofstream fout;
 	fout.open(configData.getLogPath());
 
 	//Config Output
 	fout << "Configuration File Data" << endl;
+	fout << "Processor Quantum Number = " << configData.getProcessorQuantumNumber()
+		 << endl;
+	fout << "CPU Scheduling Code = " << scheduleType << endl;
 	fout << "Monitor = " << configData.getMonitorTime() << " ms/cycle" << endl;
 	fout << "Processor = " << configData.getProcessorTime() << " ms/cycle" << endl;
 	fout << "Scanner = " << configData.getScannerTime() << " ms/cycle" << endl;

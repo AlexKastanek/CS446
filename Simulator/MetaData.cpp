@@ -361,6 +361,22 @@ int MetaData::getTotalTime()
 }
 
 /**
+*	Function: setData
+*	Description: sets the data to the parameters: codeSource, descriptorSource,
+*   	cycleSource, and totalTimeSource
+*/
+void MetaData::setData(char codeSource, string descriptorSource, int cycleSource,
+					   int totalTimeSource)
+{
+
+	code = codeSource;
+	descriptor = descriptorSource;
+	numOfCycles = cycleSource;
+	totalTime = totalTimeSource;
+
+}
+
+/**
 *	Function: setCode
 *	Description: sets the code to the parameter: codeSource
 */
@@ -403,3 +419,23 @@ void MetaData::setTotalTime(int totalTimeSource)
 	totalTime = totalTimeSource;
 
 }
+
+void MetaData::print()
+{
+
+	cout << code << "{" << descriptor << "}" << numOfCycles << "-" << totalTime;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

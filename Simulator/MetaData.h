@@ -41,10 +41,13 @@ class MetaData
 		int getNumOfCycles();
 		int getTotalTime();
 		
+		void setData(char, string, int, int);
 		void setCode(char);
 		void setDescriptor(string);
 		void setNumOfCycles(int);
 		void setTotalTime(int);
+		
+		void print();
 	
 	//MetaData class private declarations
 	private:

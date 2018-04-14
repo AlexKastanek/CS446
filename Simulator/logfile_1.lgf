@@ -1,6 +1,6 @@
 Configuration File Data
 Processor Quantum Number = 1
-CPU Scheduling Code = PS
+CPU Scheduling Code = SJ
 Monitor = 22 ms/cycle
 Processor = 5 ms/cycle
 Scanner = 30 ms/cycle
@@ -23,22 +23,28 @@ I{keyboard}18 - 1080 ms
 M{allocate}4 - 40 ms
 P{run}6 - 30 ms
 
-0.000002 - Simulator program starting
-0.000102 - OS: preparing process 1
-0.000133 - OS: starting process 1
-0.000165 - Process 1: start processing action
-0.055427 - Process 1: end processing action
-0.055501 - Process 1: allocating memory
-0.075683 - Process 1: memory allocated at 0x00000000
-0.075759 - Process 1: start hard drive output on HDD 0
-0.975973 - Process 1: end hard drive output
-0.976115 - Process 1: start processing action
-0.996280 - Process 1: end processing action
-0.996358 - Process 1: start keyboard input
-2.076463 - Process 1: end keyboard input
-2.076593 - Process 1: allocating memory
-2.116687 - Process 1: memory allocated at 0x00000080
-2.116771 - Process 1: start processing action
-2.146971 - Process 1: end processing action
-2.147063 - OS: removing process 1
-2.147121 - Simulator program ending
+0.000004 - Simulator program starting
+0.000072 - OS: preparing process 1
+0.000095 - OS: starting process 1
+0.000122 - Process 1: start hard drive output on HDD 0
+0.900634 - Process 1: end hard drive output
+0.900803 - OS: removing process 1
+0.900845 - OS: preparing process 2
+0.900886 - OS: starting process 2
+0.900977 - Process 2: start processing action
+0.956074 - Process 2: end processing action
+0.956146 - Process 2: allocating memory
+0.976282 - Process 2: memory allocated at 0x00000000
+0.976458 - OS: removing process 2
+0.976491 - OS: preparing process 3
+0.976573 - OS: starting process 3
+0.976659 - Process 3: start processing action
+0.996843 - Process 3: end processing action
+0.996927 - Process 3: start keyboard input
+2.077048 - Process 3: end keyboard input
+2.077137 - Process 3: allocating memory
+2.117294 - Process 3: memory allocated at 0x00000000
+2.117410 - Process 3: start processing action
+2.147508 - Process 3: end processing action
+2.147573 - OS: removing process 3
+2.147585 - Simulator program ending

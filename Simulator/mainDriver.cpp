@@ -40,7 +40,7 @@ pthread_mutex_t mutexProjector;
 bool getMetaData(ifstream&, Config, deque<MetaData>&);
 
 bool prepProgram(Config, deque<MetaData>, deque<deque<MetaData>>&);
-bool runProgram(Config, deque<MetaData>, int);
+bool runProgram(Config, deque<deque<MetaData>>);
 bool handleProcess(Config, MetaData, PCB&);
 bool systemHandler(PCB&, string);
 bool applicationHandler(PCB&, string);
@@ -50,6 +50,7 @@ bool inputHandler(PCB&, string, int);
 bool outputHandler(PCB&, string, int);
 
 void prioritySchedule(vector<deque<MetaData>>, deque<deque<MetaData>>&);
+void shortestJobFirstSchedule(vector<deque<MetaData>>, deque<deque<MetaData>>&);
 
 unsigned int generateMemoryAddress();
 int allocateMemory(PCB&, Config);
@@ -159,7 +160,7 @@ int main(int argc, char *argv[])
 		if (okToContinue)
 		{
 			outputType = configData[i].getLogType();
-			okToContinue = runProgram(configData[i], instructionSet[i], i);
+			okToContinue = runProgram(configData[i], processQueue);
 		}
 		else
 		{
@@ -322,8 +323,8 @@ bool prepProgram(Config configData, deque<MetaData> instructionSet,
 		processStorage.push_back(processes[i]);
 	}
 	
-	//to ensure consistency, adding meta data start and finish commands for system
-	//and application to the queues
+	//to ensure consistency, adding meta data start and finish commands for 
+	//application to the queues
 	MetaData systemBegin, systemFinish, appBegin, appFinish;
 	systemBegin.setData('S', "begin", 0, 0);
 	systemFinish.setData('S', "finish", 0, 0);
@@ -333,14 +334,6 @@ bool prepProgram(Config configData, deque<MetaData> instructionSet,
 	{
 		processStorage[i].push_front(appBegin);
 		processStorage[i].push_back(appFinish);
-		if (i == 0)
-		{
-			processStorage[i].push_front(systemBegin);
-		}
-		if (i == processStorage.size() - 1)
-		{
-			processStorage[i].push_back(systemFinish);
-		}
 	}
 	
 	/*cout << processStorage.size() << endl;
@@ -372,12 +365,27 @@ bool prepProgram(Config configData, deque<MetaData> instructionSet,
 	else if (configData.getCpuScheduleCode() == 2)
 	{
 		//SJF
+		shortestJobFirstSchedule(processStorage, program);
 	}
 	else
 	{
 		cout << "ERROR: incorrect cpu scheduling code recorded" << endl;
 		return 0;
 	}
+	
+	//adding meta data start and finish commands for system to the queues
+	program[0].push_front(systemBegin);
+	program[program.size() - 1].push_back(systemFinish);
+	
+	for (int i = 0; i < program.size(); i++)
+	{
+		for (int j = 0; j < program[i].size(); j++)
+		{
+			program[i][j].print();
+		}
+		cout << endl;
+	}
+	cout << endl;
 
 }
 
@@ -390,20 +398,23 @@ bool prepProgram(Config configData, deque<MetaData> instructionSet,
 *		the program uses as well as the instructions of the program and the number of 
 *		the program.
 */
-bool runProgram(Config configData, deque<MetaData> program, int programNum)
+bool runProgram(Config configData, deque<deque<MetaData>> program)
 {
 
-	PCB programData;
+	PCB processData[program.size()];
 	clock_t start;
 	double duration;
 	bool okToContinue = 1;
 	
-	//setting parameters of program's process control block
-	programData.setpid(programNum + 1);
-	programData.setHardDriveQuant(configData.getHddQuant());
-	programData.setProjectorQuant(configData.getProjQuant());
-	programData.setStartTime(0);
-	programData.setProcessDuration(0);
+	//setting parameters of program's process control blocks
+	for (int i = 0; i < program.size(); i++)
+	{
+		processData[i].setpid(i + 1);
+		processData[i].setHardDriveQuant(configData.getHddQuant());
+		processData[i].setProjectorQuant(configData.getProjQuant());
+		processData[i].setStartTime(0);
+		processData[i].setProcessDuration(0);
+	}
 	
 	//initializing mutex
 	pthread_mutex_init(&mutexHdd, NULL);
@@ -416,58 +427,28 @@ bool runProgram(Config configData, deque<MetaData> program, int programNum)
 	start = clock();
 	duration = (clock() - start) / (double) CLOCKS_PER_SEC;
 	
-	//using switch statement to output to file, monitor, or both
-	switch (outputType)
-	{
-		case 0:
-			cout << fixed << duration << " - Simulator program starting" << endl;
-		break;
-		case 1:
-			fout << fixed << duration << " - Simulator program starting" << endl;
-		break;
-		case 2:
-			cout << fixed << duration << " - Simulator program starting" << endl;
-			fout << fixed << duration << " - Simulator program starting" << endl;
-		break;
-		default:
-			cout << "ERROR: Incorrect log type recorded from config file" << endl;
-			return 0;
-	}
-	
-	//loops through each meta data instruction and calls handleProcess() to handle each 
-	//process
+	//loops through each meta data instruction and calls handleProcess() to handle 
+	//each task
 	for (int i = 0; i < program.size(); i++)
 	{
-		if (okToContinue)
+		for (int j = 0; j < program[i].size(); j++)
 		{
+			if (okToContinue)
+			{
+				duration = ((clock() - start) / (double) CLOCKS_PER_SEC);
+				processData[i].setProcessDuration(duration);
+				okToContinue = handleProcess(configData, program[i][j], 
+											 processData[i]);
+			}
+			else
+			{
+				return 0;
+			}
 			duration = ((clock() - start) / (double) CLOCKS_PER_SEC);
-			programData.setProcessDuration(duration);
-			okToContinue = handleProcess(configData, program[i], programData);
 		}
-		else
-		{
-			return 0;
-		}
-		duration = ((clock() - start) / (double) CLOCKS_PER_SEC);
-		//cout << "clock test: " << fixed << duration << endl;
 	}
 	
-	switch (outputType)
-	{
-		case 0:
-			cout << fixed << duration << " - Simulator program ending" << endl;
-		break;
-		case 1:
-			fout << fixed << duration << " - Simulator program ending" << endl;
-		break;
-		case 2:
-			cout << fixed << duration << " - Simulator program ending" << endl;
-			fout << fixed << duration << " - Simulator program ending" << endl;
-		break;
-		default:
-			cout << "ERROR: Incorrect log type recorded from config file" << endl;
-			return 0;
-	}
+	
 	
 	return 1;
 
@@ -536,10 +517,81 @@ bool handleProcess(Config cData, MetaData process, PCB& pData)
 
 /**
 *	Function: systemHandler
+*	Description: Prepares and starts the system as well as ends it. Updates the 
+*		duration of the process contained in the process' PCB. 
+*/
+bool systemHandler(PCB& pData, string descriptor)
+{
+
+	clock_t start;
+	int pid = pData.getpid();
+	double duration;
+	
+	start = clock();
+
+	if (descriptor == "begin")
+	{
+		//using switch statement to output to file, monitor, or both
+		switch (outputType)
+		{
+			case 0:
+				cout << fixed << pData.getProcessDuration() 
+					 << " - Simulator program starting" << endl;
+			break;
+			case 1:
+				fout << fixed << pData.getProcessDuration() 
+					 << " - Simulator program starting" << endl;
+			break;
+			case 2:
+				cout << fixed << pData.getProcessDuration() 
+					 << " - Simulator program starting" << endl;
+				fout << fixed << pData.getProcessDuration() 
+					 << " - Simulator program starting" << endl;
+			break;
+			default:
+				cout << "ERROR: Incorrect log type recorded from config file" << endl;
+				return 0;
+		}
+	}
+	else if (descriptor == "finish")
+	{
+		switch (outputType)
+		{
+			case 0:
+				cout << fixed << pData.getProcessDuration() 
+					 << " - Simulator program ending" << endl;
+			break;
+			case 1:
+				fout << fixed << pData.getProcessDuration() 
+					 << " - Simulator program ending" << endl;
+			break;
+			case 2:
+				cout << fixed << pData.getProcessDuration() 
+					 << " - Simulator program ending" << endl;
+				fout << fixed << pData.getProcessDuration() 
+					 << " - Simulator program ending" << endl;
+			break;
+			default:
+				cout << "ERROR: Incorrect log type recorded from config file" << endl;
+				return 0;
+		}	
+	}
+	else
+	{
+		cout << "ERROR: Incorrect descriptor recorded for Meta-Data code 'S'" << endl;
+		return 0;
+	}
+	
+	return 1;
+
+}
+
+/**
+*	Function: applicationHandler
 *	Description: Prepares and starts a process as well as ends it. Updates the duration 
 *		of the process contained in the process' PCB. 
 */
-bool systemHandler(PCB& pData, string descriptor)
+bool applicationHandler(PCB& pData, string descriptor)
 {
 
 	clock_t start;
@@ -620,20 +672,9 @@ bool systemHandler(PCB& pData, string descriptor)
 	}
 	else
 	{
-		cout << "ERROR: Incorrect descriptor recorded for Meta-Data code 'S'" << endl;
+		cout << "ERROR: Incorrect descriptor recorded for Meta-Data code 'A'" << endl;
 		return 0;
 	}
-	
-	return 1;
-
-}
-
-/**
-*	Function: applicationHandler
-*	Description: returns 1 for now
-*/
-bool applicationHandler(PCB& pData, string descriptor)
-{
 	
 	return 1;
 
@@ -1247,13 +1288,7 @@ void prioritySchedule(vector<deque<MetaData>> processStorage, deque<deque<MetaDa
 		}
 	}
 	
-	/*for (int i = 0; i < processStorage.size(); i++)
-	{
-		cout << processIOCounters[i] << ", ";
-	}
-	cout << endl;*/
-	
-	bool sorted = true;
+	//sort processes by processIOCounters
 	int largestIOValue, largestIOIndex = 0;
 	for (int i = 0; i < processStorage.size(); i++)
 	{
@@ -1270,7 +1305,7 @@ void prioritySchedule(vector<deque<MetaData>> processStorage, deque<deque<MetaDa
 		processIOCounters[largestIOIndex] = -1;
 	}
 	
-	for (int i = 0; i < program.size(); i++)
+	/*for (int i = 0; i < program.size(); i++)
 	{
 		for (int j = 0; j < program[i].size(); j++)
 		{
@@ -1278,7 +1313,46 @@ void prioritySchedule(vector<deque<MetaData>> processStorage, deque<deque<MetaDa
 		}
 		cout << endl;
 	}
-	cout << endl;
+	cout << endl;*/
+
+}
+
+void shortestJobFirstSchedule(vector<deque<MetaData>> processStorage, 
+							  deque<deque<MetaData>>& program)
+{
+
+	//sort processes by amount of tasks
+	int largestNumOfTasks = 0, lastLargestNumOfTasks = 0;
+	int largestIndex = 0, lastLargestIndex = 0;;
+	for (int i = 0; i < processStorage.size(); i++)
+	{
+		largestNumOfTasks = 0;
+		for (int j = 0; j < processStorage.size(); j++)
+		{
+			if (i == 0)
+			{
+				if (processStorage[j].size() > largestNumOfTasks)
+				{
+					largestNumOfTasks = processStorage[j].size();
+					largestIndex = j;
+				}
+			}
+			else
+			{
+				if (processStorage[j].size() > largestNumOfTasks &&
+					processStorage[j].size() <= lastLargestNumOfTasks &&
+					j != lastLargestIndex)
+				{
+					largestNumOfTasks = processStorage[j].size();
+					largestIndex = j;
+				}
+			}
+		}
+		
+		program.push_front(processStorage[largestIndex]);
+		lastLargestNumOfTasks = largestNumOfTasks;
+		lastLargestIndex = largestIndex;
+	}
 
 }
 

@@ -29,6 +29,8 @@ using namespace std;
 ofstream fout;
 int outputType;
 
+int blockCount, lastAddress;
+
 pthread_mutex_t mutexHdd;
 pthread_mutex_t mutexKeyboard;
 pthread_mutex_t mutexScanner;
@@ -116,6 +118,10 @@ int main(int argc, char *argv[])
 	
 		//assigning metaDataFile to file name specified in config data
 		metaDataFile = configData[i].getFilePath();
+		
+		//resetting memory
+		blockCount = 0;
+		lastAddress = 0;
 
 		//begin meta-data file error checking and input
 		fin.open(metaDataFile);
@@ -651,17 +657,17 @@ bool applicationHandler(PCB& pData, string descriptor)
 		switch (outputType)
 		{
 			case 0:
-				cout << pData.getProcessDuration() << " - OS: removing process " << pid 
+				cout << pData.getProcessDuration() << " - End process " << pid 
 				<< endl;
 			break;
 			case 1:
-				fout << pData.getProcessDuration() << " - OS: removing process " << pid 
+				fout << pData.getProcessDuration() << " - End process " << pid 
 				<< endl;
 			break;
 			case 2:
-				cout << pData.getProcessDuration() << " - OS: removing process " << pid 
+				cout << pData.getProcessDuration() << " - End process " << pid 
 				<< endl;
-				fout << pData.getProcessDuration() << " - OS: removing process " << pid 
+				fout << pData.getProcessDuration() << " - End process " << pid 
 				<< endl;
 			break;
 			default:
@@ -1377,7 +1383,7 @@ unsigned int generateMemoryAddress()
 /**
 *	Function: allocateMemory
 *	Description: allocates amount of memory specified in cData to the location 
-*		specified in pDataa which stores the last memory address used. If max memory is 
+*		specified in pData which stores the last memory address used. If max memory is 
 *		reached or if no memory is allocated, the next address will be at location 0. 
 *		After the memory is allocated, updates pData. Returns -1 if the address is 
 *		below 0 or if the address is above the max system memory to signify an error.
@@ -1386,17 +1392,17 @@ int allocateMemory(PCB& pData, Config cData)
 {
 
 	int addressIndex, nextAddress;
-	if (pData.getBlockCount() == 0)
+	if (blockCount == 0)
 	{
 		addressIndex = 0;
 	}
 	else
 	{
-		addressIndex = pData.getLastAddress();
+		addressIndex = lastAddress;
 	}
 	nextAddress = (addressIndex + cData.getBlockSize()) % cData.getSystemMemory();
-	pData.setLastAddress(nextAddress);
-	pData.incrementBlockCount();
+	lastAddress = nextAddress;
+	blockCount++;;
 	
 	if (addressIndex < 0 || addressIndex > cData.getSystemMemory())
 	{

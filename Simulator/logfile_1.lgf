@@ -23,28 +23,28 @@ I{keyboard}18 - 1080 ms
 M{allocate}4 - 40 ms
 P{run}6 - 30 ms
 
-0.000004 - Simulator program starting
-0.000072 - OS: preparing process 1
-0.000095 - OS: starting process 1
-0.000122 - Process 1: start hard drive output on HDD 0
-0.900634 - Process 1: end hard drive output
-0.900803 - OS: removing process 1
-0.900845 - OS: preparing process 2
-0.900886 - OS: starting process 2
-0.900977 - Process 2: start processing action
-0.956074 - Process 2: end processing action
-0.956146 - Process 2: allocating memory
-0.976282 - Process 2: memory allocated at 0x00000000
-0.976458 - OS: removing process 2
-0.976491 - OS: preparing process 3
-0.976573 - OS: starting process 3
-0.976659 - Process 3: start processing action
-0.996843 - Process 3: end processing action
-0.996927 - Process 3: start keyboard input
-2.077048 - Process 3: end keyboard input
-2.077137 - Process 3: allocating memory
-2.117294 - Process 3: memory allocated at 0x00000000
-2.117410 - Process 3: start processing action
-2.147508 - Process 3: end processing action
-2.147573 - OS: removing process 3
-2.147585 - Simulator program ending
+0.000003 - Simulator program starting
+0.000146 - OS: preparing process 1
+0.000218 - OS: starting process 1
+0.000314 - Process 1: start hard drive output on HDD 0
+0.901059 - Process 1: end hard drive output
+0.901249 - End process 1
+0.901290 - OS: preparing process 2
+0.901324 - OS: starting process 2
+0.901357 - Process 2: start processing action
+0.956603 - Process 2: end processing action
+0.956830 - Process 2: allocating memory
+0.976992 - Process 2: memory allocated at 0x00000000
+0.977089 - End process 2
+0.977121 - OS: preparing process 3
+0.977147 - OS: starting process 3
+0.977175 - Process 3: start processing action
+0.997295 - Process 3: end processing action
+0.997359 - Process 3: start keyboard input
+2.077633 - Process 3: end keyboard input
+2.077710 - Process 3: allocating memory
+2.117794 - Process 3: memory allocated at 0x00000080
+2.117865 - Process 3: start processing action
+2.148109 - Process 3: end processing action
+2.148242 - End process 3
+2.148263 - Simulator program ending

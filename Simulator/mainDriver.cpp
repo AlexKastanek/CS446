@@ -16,6 +16,7 @@
 #include <deque>
 #include <string>
 #include <pthread.h>
+#include <semaphore.h>
 #include <limits.h>
 #include <time.h>
 #include "Config.h"
@@ -31,11 +32,11 @@ int outputType;
 
 int blockCount, lastAddress;
 
-pthread_mutex_t mutexHdd;
 pthread_mutex_t mutexKeyboard;
 pthread_mutex_t mutexScanner;
 pthread_mutex_t mutexMonitor;
-pthread_mutex_t mutexProjector;
+sem_t semaphoreHdd;
+sem_t semaphoreProj;
 
 //function headers
 
@@ -175,11 +176,12 @@ int main(int argc, char *argv[])
 		}
 		
 		fout.close();
-		pthread_mutex_destroy(&mutexHdd);
+		
 		pthread_mutex_destroy(&mutexKeyboard);
 		pthread_mutex_destroy(&mutexScanner);
 		pthread_mutex_destroy(&mutexMonitor);
-		pthread_mutex_destroy(&mutexProjector);
+		sem_destroy(&semaphoreHdd);
+		sem_destroy(&semaphoreProj);
 	
 	}
 
@@ -423,11 +425,11 @@ bool runProgram(Config configData, deque<deque<MetaData>> program)
 	}
 	
 	//initializing mutex
-	pthread_mutex_init(&mutexHdd, NULL);
 	pthread_mutex_init(&mutexKeyboard, NULL);
 	pthread_mutex_init(&mutexScanner, NULL);
 	pthread_mutex_init(&mutexMonitor, NULL);
-	pthread_mutex_init(&mutexProjector, NULL);
+	sem_init(&semaphoreHdd, 0, configData.getHddQuant());
+	sem_init(&semaphoreProj, 0, configData.getProjQuant());
 	
 	//starting program clock and initializing duration
 	start = clock();
@@ -1446,11 +1448,11 @@ void* hardDriveInputHandler(void* hdTime)
 		exit(-1);
 	}
 	
-	pthread_mutex_lock(&mutexHdd);
+	sem_wait(&semaphoreHdd);
 	
 	//further functionality will go here
 	
-	pthread_mutex_unlock(&mutexHdd);
+	sem_post(&semaphoreHdd);
 	
 	pthread_join(timerThread, NULL);
 
@@ -1533,11 +1535,11 @@ void* hardDriveOutputHandler(void* hdTime)
 		exit(-1);
 	}
 	
-	pthread_mutex_lock(&mutexHdd);
+	sem_wait(&semaphoreHdd);
 	
 	//further functionality will go here
 	
-	pthread_mutex_unlock(&mutexHdd);
+	sem_post(&semaphoreHdd);
 	
 	pthread_join(timerThread, NULL);
 
@@ -1591,11 +1593,11 @@ void* projectorHandler(void* pTime)
 		exit(-1);
 	}
 	
-	pthread_mutex_lock(&mutexProjector);
+	sem_wait(&semaphoreProj);
 	
 	//further functionality will go here
 	
-	pthread_mutex_unlock(&mutexProjector);
+	sem_post(&semaphoreProj);
 	
 	pthread_join(timerThread, NULL);
 

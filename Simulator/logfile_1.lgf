@@ -24,27 +24,27 @@ M{allocate}4 - 40 ms
 P{run}6 - 30 ms
 
 0.000003 - Simulator program starting
-0.000260 - OS: preparing process 1
-0.000376 - OS: starting process 1
-0.000545 - Process 1: start hard drive output on HDD 0
-0.901268 - Process 1: end hard drive output
-0.901340 - End process 1
-0.901355 - OS: preparing process 2
-0.901363 - OS: starting process 2
-0.901372 - Process 2: start processing action
-0.956481 - Process 2: end processing action
-0.956598 - Process 2: allocating memory
-0.976747 - Process 2: memory allocated at 0x00000000
-0.976843 - End process 2
-0.976862 - OS: preparing process 3
-0.976876 - OS: starting process 3
-0.976891 - Process 3: start processing action
-0.997057 - Process 3: end processing action
-0.997106 - Process 3: start keyboard input
-2.077198 - Process 3: end keyboard input
-2.077283 - Process 3: allocating memory
-2.117415 - Process 3: memory allocated at 0x00000080
-2.117539 - Process 3: start processing action
-2.147683 - Process 3: end processing action
-2.147782 - End process 3
-2.147815 - Simulator program ending
+0.000118 - OS: preparing process 1
+0.000150 - OS: starting process 1
+0.000182 - Process 1: start hard drive output on HDD 0
+0.900912 - Process 1: end hard drive output
+0.901072 - End process 1
+0.901140 - OS: preparing process 2
+0.901177 - OS: starting process 2
+0.901192 - Process 2: start processing action
+0.956273 - Process 2: end processing action
+0.956371 - Process 2: allocating memory
+0.976443 - Process 2: memory allocated at 0x00000000
+0.976505 - End process 2
+0.976542 - OS: preparing process 3
+0.976555 - OS: starting process 3
+0.976568 - Process 3: start processing action
+0.996628 - Process 3: end processing action
+0.996668 - Process 3: start keyboard input
+2.076958 - Process 3: end keyboard input
+2.077114 - Process 3: allocating memory
+2.117183 - Process 3: memory allocated at 0x00000080
+2.117255 - Process 3: start processing action
+2.147343 - Process 3: end processing action
+2.147451 - End process 3
+2.147467 - Simulator program ending

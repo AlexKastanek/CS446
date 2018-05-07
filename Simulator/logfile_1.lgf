@@ -1,13 +1,13 @@
 Configuration File Data
 Processor Quantum Number = 1
-CPU Scheduling Code = SJ
+CPU Scheduling Code = STR
 Monitor = 22 ms/cycle
 Processor = 5 ms/cycle
 Scanner = 30 ms/cycle
 Hard Drive = 150 ms/cycle
 Keyboard = 60 ms/cycle
 Memory = 10 ms/cycle
-Projector = 550 ms/cycle
+Projector = 100 ms/cycle
 System Memory = 2048 kbytes
 Memory Block Size = 128 kbytes
 Projector Quantity = 4
@@ -15,36 +15,49 @@ Hard Drive Quantity = 2
 Logged to: monitor and logfile_1.lgf
 
 Meta-Data Metrics
-P{run}11 - 55 ms
+P{run}30 - 150 ms
 M{allocate}2 - 20 ms
-O{hard drive}6 - 900 ms
+O{hard drive}1 - 150 ms
 P{run}4 - 20 ms
 I{keyboard}18 - 1080 ms
 M{allocate}4 - 40 ms
 P{run}6 - 30 ms
+I{scanner}8 - 240 ms
+P{run}12 - 60 ms
+O{projector}4 - 400 ms
 
-0.000003 - Simulator program starting
-0.000118 - OS: preparing process 1
-0.000150 - OS: starting process 1
-0.000182 - Process 1: start hard drive output on HDD 0
-0.900912 - Process 1: end hard drive output
-0.901072 - End process 1
-0.901140 - OS: preparing process 2
-0.901177 - OS: starting process 2
-0.901192 - Process 2: start processing action
-0.956273 - Process 2: end processing action
-0.956371 - Process 2: allocating memory
-0.976443 - Process 2: memory allocated at 0x00000000
-0.976505 - End process 2
-0.976542 - OS: preparing process 3
-0.976555 - OS: starting process 3
-0.976568 - Process 3: start processing action
-0.996628 - Process 3: end processing action
-0.996668 - Process 3: start keyboard input
-2.076958 - Process 3: end keyboard input
-2.077114 - Process 3: allocating memory
-2.117183 - Process 3: memory allocated at 0x00000080
-2.117255 - Process 3: start processing action
-2.147343 - Process 3: end processing action
-2.147451 - End process 3
-2.147467 - Simulator program ending
+0.000340 - Simulator program starting
+0.000753 - OS: preparing process 1
+0.000900 - OS: starting process 1
+0.001056 - Process 1: start processing action
+0.101195 - Process 1: interrupt processing action
+0.101335 - OS: preparing process 2
+0.101395 - OS: starting process 2
+0.101461 - Process 2: start hard drive output on HDD 0
+0.279011 - Process 2: end hard drive output
+0.279171 - End process 2
+0.279284 - Process 1: end processing action
+0.279349 - Process 1: allocating memory
+0.299448 - Process 1: memory allocated at 0x00000000
+0.299551 - End process 1
+0.299603 - OS: preparing process 3
+0.299631 - OS: starting process 3
+0.299644 - Process 3: start processing action
+0.304027 - Process 3: interrupt processing action
+0.304115 - OS: preparing process 4
+0.304141 - OS: starting process 4
+0.304169 - Process 4: start scanner input
+0.304214 - Process 4: start processing action
+0.479313 - Process 4: end processing action
+0.480184 - Process 4: start projector output on PROJ 0
+0.554166 - Process 4: end scanner input
+0.880517 - Process 4: end projector output
+0.880639 - End process 4
+0.880723 - Process 3: end processing action
+0.880757 - Process 3: start keyboard input
+0.880795 - Process 3: allocating memory
+0.920911 - Process 3: memory allocated at 0x00000080
+0.921067 - Process 3: end processing action
+0.921107 - End process 3
+1.961037 - Process 3: end keyboard input
+1.961250 - Simulator program ending

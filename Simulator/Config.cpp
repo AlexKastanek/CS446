@@ -143,6 +143,14 @@ void Config::getConfigData(ifstream& fin)
 	{
 		cpuScheduleCode = 2;
 	}
+	else if (word == "STR")
+	{
+		cpuScheduleCode = 3;
+	}
+	else if (word == "RR")
+	{
+		cpuScheduleCode = 4;
+	}
 	else
 	{
 		cout << "ERROR: invalid code on line 5" << endl;

@@ -1,6 +1,6 @@
-all: Sim04
-Sim04: mainDriver.o Config.o MetaData.o PCB.o
-	g++ -std=c++11 -pthread mainDriver.o Config.o MetaData.o PCB.o -o Sim04
+all: Sim05
+Sim05: mainDriver.o Config.o MetaData.o PCB.o
+	g++ -std=c++11 -pthread mainDriver.o Config.o MetaData.o PCB.o -o Sim05
 mainDriver.o: mainDriver.cpp
 	g++ -std=c++11 -pthread -c mainDriver.cpp
 Config.o: Config.cpp
@@ -10,4 +10,4 @@ MetaData.o: MetaData.cpp
 PCB.o: PCB.cpp
 	g++ -std=c++11 -pthread -c PCB.cpp
 clean:
-	rm -rf *.o Sim04
+	rm -rf *.o Sim05

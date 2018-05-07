@@ -52,6 +52,20 @@ PCB::~PCB()
 
 }
 
+bool PCB::isInterrupted()
+{
+
+	return interrupted;
+
+}
+
+bool PCB::hasBeenInterrupted()
+{
+
+	return interruptHasOccurred;
+
+}
+
 /**
 *	Function: getpid
 *	Description: returns the pid for this process
@@ -140,6 +154,20 @@ double PCB::getStartTime()
 	
 }
 
+double PCB::getEstimatedProcessTime()
+{
+
+	return estimatedProcessTime;
+
+}
+
+double PCB::getEstimatedTimeRemaining()
+{
+
+	return estimatedTimeRemaining;
+
+}
+
 /**
 *	Function: getProcessDuration
 *	Description: returns the duration of this process
@@ -149,6 +177,25 @@ double PCB::getProcessDuration()
 
 	return processDuration;
 	
+}
+
+void PCB::interrupt()
+{
+
+	interrupted = true;
+	interruptHasOccurred = true;
+
+}
+
+void PCB::setInterrupt(bool source)
+{
+
+	interrupted = source;
+	if (source)
+	{
+		interruptHasOccurred = true;
+	}
+
 }
 
 /**
@@ -250,6 +297,20 @@ void PCB::setProcessDuration(double source)
 	
 }
 
+void PCB::setEstimatedProcessTime(double source)
+{
+
+	estimatedProcessTime = source;
+
+}
+
+void PCB::setEstimatedTimeRemaining(double source)
+{
+
+	estimatedTimeRemaining = source;
+
+}
+
 /**
 *	Function: updateProcessDuration
 *	Description: updates the processDuration by adding the parameter duration to it
@@ -291,6 +352,20 @@ void PCB::incrementProjectorsUsed()
 {
 
 	projectorsUsed++;
+
+}
+
+void PCB::saveState(double state)
+{
+
+	processData = state;
+
+}
+
+double PCB::loadState()
+{
+
+	return processData;
 
 }
 

@@ -29,6 +29,8 @@ class PCB
 		PCB(int);
 		~PCB();
 		
+		bool isInterrupted();
+		bool hasBeenInterrupted();
 		int getpid();
 		int getBlockCount();
 		int getLastAddress();
@@ -38,7 +40,11 @@ class PCB
 		int getProjectorsUsed();
 		double getStartTime();
 		double getProcessDuration();
+		double getEstimatedProcessTime();
+		double getEstimatedTimeRemaining();
 		
+		void interrupt();
+		void setInterrupt(bool);
 		void setpid(int);
 		void setBlockCount(int);
 		void setLastAddress(int);
@@ -48,20 +54,28 @@ class PCB
 		void setProjectorsUsed(int);
 		void setStartTime(double);
 		void setProcessDuration(double);
+		void setEstimatedProcessTime(double);
+		void setEstimatedTimeRemaining(double);
 		void updateProcessDuration(double);
 		void incrementBlockCount();
 		void incrementHardDrivesUsed();
 		void incrementProjectorsUsed();
 		
+		void saveState(double);
+		double loadState();
+		
 		int processState;
 		
 	private:
+	
+		bool interrupted, interruptHasOccurred;
 	
 		int pid; //process ID
 		int blockCount, lastAddress;
 		int hardDriveQuant, hardDrivesUsed, projectorQuant, projectorsUsed;
 		
-		double startTime, processDuration;
+		double startTime, processDuration, estimatedProcessTime, estimatedTimeRemaining;
+		double processData;
 
 };
 

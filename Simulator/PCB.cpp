@@ -99,6 +99,13 @@ int PCB::getLastAddress()
 	
 }
 
+int PCB::getQueueIndex()
+{
+
+	return queueIndex;
+
+}
+
 /**
 *	Function: getHardDriveQuant()
 *	Description: returns the max quantity of hard drives for this process
@@ -198,6 +205,11 @@ void PCB::setInterrupt(bool source)
 
 }
 
+void PCB::setInterruptOccurred(bool source)
+{
+	interruptHasOccurred = source;
+}
+
 /**
 *	Function: setpid
 *	Description: sets the pid to the parameter pidSource
@@ -229,6 +241,13 @@ void PCB::setLastAddress(int source)
 
 	lastAddress = source;
 	
+}
+
+void PCB::setQueueIndex(int source)
+{
+
+	queueIndex = source;
+
 }
 
 /**

@@ -22,42 +22,60 @@ P{run}4 - 20 ms
 I{keyboard}18 - 1080 ms
 M{allocate}4 - 40 ms
 P{run}6 - 30 ms
+I{hard drive}3 - 450 ms
+O{monitor}4 - 88 ms
 I{scanner}8 - 240 ms
 P{run}12 - 60 ms
 O{projector}4 - 400 ms
+P{run}6 - 30 ms
+M{allocate}3 - 30 ms
 
-0.000340 - Simulator program starting
-0.000753 - OS: preparing process 1
-0.000900 - OS: starting process 1
-0.001056 - Process 1: start processing action
-0.101195 - Process 1: interrupt processing action
-0.101335 - OS: preparing process 2
-0.101395 - OS: starting process 2
-0.101461 - Process 2: start hard drive output on HDD 0
-0.279011 - Process 2: end hard drive output
-0.279171 - End process 2
-0.279284 - Process 1: end processing action
-0.279349 - Process 1: allocating memory
-0.299448 - Process 1: memory allocated at 0x00000000
-0.299551 - End process 1
-0.299603 - OS: preparing process 3
-0.299631 - OS: starting process 3
-0.299644 - Process 3: start processing action
-0.304027 - Process 3: interrupt processing action
-0.304115 - OS: preparing process 4
-0.304141 - OS: starting process 4
-0.304169 - Process 4: start scanner input
-0.304214 - Process 4: start processing action
-0.479313 - Process 4: end processing action
-0.480184 - Process 4: start projector output on PROJ 0
-0.554166 - Process 4: end scanner input
-0.880517 - Process 4: end projector output
-0.880639 - End process 4
-0.880723 - Process 3: end processing action
-0.880757 - Process 3: start keyboard input
-0.880795 - Process 3: allocating memory
-0.920911 - Process 3: memory allocated at 0x00000080
-0.921067 - Process 3: end processing action
-0.921107 - End process 3
-1.961037 - Process 3: end keyboard input
-1.961250 - Simulator program ending
+0.000382 - Simulator program starting
+0.000934 - OS: preparing process 1
+0.001003 - OS: starting process 1
+0.001084 - Process 1: start processing action
+0.104656 - Process 1: interrupt processing action
+0.104856 - OS: preparing process 2
+0.104905 - OS: starting process 2
+0.104953 - Process 2: start hard drive output on HDD 0
+0.105093 - End process 2
+0.105242 - Process 1: end processing action
+0.105295 - Process 1: allocating memory
+0.138339 - Process 1: memory allocated at 0x00000000
+0.138414 - End process 1
+0.235812 - OS: preparing process 3
+0.236010 - OS: starting process 3
+0.236074 - Process 3: start processing action
+0.276789 - Process 2: end hard drive output
+0.290857 - Process 3: end processing action
+0.290936 - Process 3: start keyboard input
+0.291076 - Process 3: allocating memory
+0.333877 - Process 3: memory allocated at 0x00000080
+0.333974 - Process 3: start processing action
+0.334049 - Process 3: interrupt processing action
+0.334111 - OS: preparing process 4
+0.334155 - OS: starting process 4
+0.334196 - Process 4: start hard drive input on HDD 0
+0.334308 - Process 4: start monitor output
+0.334396 - End process 4
+0.334504 - Process 3: end processing action
+0.334551 - End process 3
+0.431360 - OS: preparing process 5
+0.431486 - OS: starting process 5
+0.431541 - Process 5: start scanner input
+0.431630 - Process 5: start processing action
+0.434135 - Process 4: end monitor output
+0.547938 - Process 5: end processing action
+0.548086 - Process 5: start projector output on PROJ 0
+0.548208 - End process 5
+0.575821 - OS: preparing process 6
+0.575926 - OS: starting process 6
+0.575993 - Process 6: start processing action
+0.669344 - Process 6: end processing action
+0.669477 - Process 6: allocating memory
+0.715339 - Process 6: memory allocated at 0x00000100
+0.715443 - End process 6
+0.728257 - Process 5: end scanner input
+0.792585 - Process 4: end hard drive input
+0.953697 - Process 5: end projector output
+0.976021 - Simulator program ending

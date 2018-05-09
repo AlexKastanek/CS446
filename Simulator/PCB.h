@@ -34,6 +34,7 @@ class PCB
 		int getpid();
 		int getBlockCount();
 		int getLastAddress();
+		int getQueueIndex();
 		int getHardDriveQuant();
 		int getHardDrivesUsed();
 		int getProjectorQuant();
@@ -45,9 +46,11 @@ class PCB
 		
 		void interrupt();
 		void setInterrupt(bool);
+		void setInterruptOccurred(bool);
 		void setpid(int);
 		void setBlockCount(int);
 		void setLastAddress(int);
+		void setQueueIndex(int);
 		void setHardDriveQuant(int);
 		void setHardDrivesUsed(int);
 		void setProjectorQuant(int);
@@ -71,7 +74,7 @@ class PCB
 		bool interrupted, interruptHasOccurred;
 	
 		int pid; //process ID
-		int blockCount, lastAddress;
+		int blockCount, lastAddress, queueIndex;
 		int hardDriveQuant, hardDrivesUsed, projectorQuant, projectorsUsed;
 		
 		double startTime, processDuration, estimatedProcessTime, estimatedTimeRemaining;

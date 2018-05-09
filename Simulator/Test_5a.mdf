@@ -2,5 +2,7 @@ Start Program Meta-Data Code:
 S{begin}0; A{begin}0; P{run}30; M{allocate}2; A{finish}0;
 A{begin}0; O{hard drive}1; A{finish}0; A{begin}0; P{run}4;
 I{keyboard}18; M{allocate}4; P{run}6; A{finish}0; A{begin}0;
-I{scanner}8; P{run}12; O{projector}4; S{finish}0.
+I{hard drive}3; O{monitor}4; A{finish}0; A{begin}0;
+I{scanner}8; P{run}12; O{projector}4; A{finish}0; A{begin}0;
+P{run}6; M{allocate}3; S{finish}0.
 End Program Meta-Data Code.

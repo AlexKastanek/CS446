@@ -28,16 +28,20 @@ using namespace std;
 //Global variables
 
 ofstream fout;
-int outputType, scheduleType;
+int outputType, scheduleType, quantumNumber;
 
 deque<deque<MetaData>> program, waitingQueue, readyQueue; //used to store each process
 deque<int> waitingProcessIndeces, loadedProcessIndeces;
 vector<PCB> pcbContainer; //used to store the pcb for each process
 
-int blockCount, lastAddress;
+int blockCount, lastAddress, ioIndex, prevFrontIndex;
 int activeProcesses = 0;
 
+bool ableToReorder = true, reordering = false, interruptOccurred = false;
+
 pthread_t inputThread;
+pthread_t outputThread;
+pthread_t rrThread;
 pthread_mutex_t mutexKeyboard;
 pthread_mutex_t mutexScanner;
 pthread_mutex_t mutexMonitor;
@@ -69,6 +73,7 @@ int allocateMemory(PCB&, Config);
 
 void* timer(void*);
 void* loader(void*);
+void* rrHandler(void*);
 void* processThread(void*);
 void* hardDriveInputHandler(void*);
 void* keyboardHandler(void*);
@@ -127,6 +132,7 @@ int main(int argc, char *argv[])
 		bool okToContinue; //used to stop the program if error ocurred
 		
 		scheduleType = configData[i].getCpuScheduleCode();
+		quantumNumber = configData[i].getProcessorQuantumNumber();
 	
 		//assigning metaDataFile to file name specified in config data
 		metaDataFile = configData[i].getFilePath();
@@ -531,7 +537,8 @@ bool loadProgram()
 			loadedProcessIndeces.push_back(waitingProcessIndeces[0]);
 			waitingQueue.pop_front();
 			waitingProcessIndeces.pop_front();
-			cout << "arrival of process " << loadedProcessIndeces.back() + 1 << endl;
+			//cout << "arrival of process " << loadedProcessIndeces.back() + 1 << endl;
+			pcbContainer[loadedProcessIndeces[0]].setQueueIndex(0);
 		}
 		else
 		{
@@ -539,10 +546,15 @@ bool loadProgram()
 			loadedProcessIndeces.push_back(waitingProcessIndeces[0]);
 			waitingQueue.pop_front();
 			waitingProcessIndeces.pop_front();
-			cout << "arrival of process " << loadedProcessIndeces.back() + 1 << endl;
-			shortestTimeRemainingSchedule(readyQueue, loadedProcessIndeces);
+			//cout << "arrival of process " << loadedProcessIndeces.back() + 1 << endl;
+			if (ableToReorder)
+			{
+				reordering = true;
+				shortestTimeRemainingSchedule(readyQueue, loadedProcessIndeces);
+				reordering = false;
+			}
 		}
-	
+		
 	}
 	else
 	{
@@ -552,10 +564,10 @@ bool loadProgram()
 		waitingQueue.pop_front();
 		waitingProcessIndeces.pop_front();
 		cout << "arrival of process " << loadedProcessIndeces.back() + 1 << endl;
-	
-		return true;
-	
+		
 	}
+	
+	return true;
 
 }
 
@@ -628,24 +640,102 @@ bool runProgram(Config configData)
 		exit(-1);
 	}
 	
+	if (scheduleType == 4)
+	{
+		rc = pthread_create(&rrThread, NULL, &rrHandler, NULL);
+		if (rc)
+		{
+			cout << "ERROR: return code from pthread_create() is " << rc << endl;
+			exit(-1);
+		}
+	}
+	
+	int processIndex = loadedProcessIndeces[0];
 	while (!waitingQueue.empty())
 	{
 		while (!readyQueue.empty())
 		{
-			okToContinue = 1;
-			int processIndex = loadedProcessIndeces[0];
+			okToContinue = 1;		
+			processIndex = loadedProcessIndeces[0];	
+			//cout << processIndex + 1 << endl;
+			//cout << queueIndex << endl;
+			deque<MetaData> currentProcess = readyQueue[0];
+			
 			while (!readyQueue[0].empty() && okToContinue)
 			{
+				//readyQueue[0][0].print();
+				//cout << endl;
+				
+				//ableToReorder = true;
+				//while (reordering) {};
+				//ableToReorder = false;
+				processIndex = loadedProcessIndeces[0];
+				//cout << queueIndex << endl;
 				if (okToContinue)
 				{
+					//ableToReorder = true;
+					interruptOccurred = false;
 					duration = ((clock() - start) / (double) CLOCKS_PER_SEC);
 					pcbContainer[processIndex].setProcessDuration(duration);
 					okToContinue = handleProcess(configData, readyQueue[0][0], 
 											 	 pcbContainer[processIndex]);
+					
+					//ableToReorder = true;						 	 
+					while (reordering) {};
+					//ableToReorder = false;
+					
 					if (okToContinue)
 					{
-						readyQueue[0].pop_front();
+						//ableToReorder = true;						 	 
+						//while (reordering) {};
+						//ableToReorder = false;
+						//currentProcess.pop_front();
+						//processIndex = loadedProcessIndeces[0];	
+						if (interruptOccurred && currentProcess[0].getCode() != 'P')
+						{
+							readyQueue[prevFrontIndex].pop_front();
+							currentProcess.pop_front();
+							ableToReorder = false;
+							while (!readyQueue[prevFrontIndex].empty() &&
+								   currentProcess[0].getCode() != 'P')
+							{
+								duration = ((clock() - start) / 
+											(double) CLOCKS_PER_SEC);
+								pcbContainer[processIndex].setProcessDuration(duration);
+								okToContinue = handleProcess(configData, readyQueue
+															 [prevFrontIndex][0],
+														    pcbContainer[processIndex]);
+								readyQueue[prevFrontIndex].pop_front();
+								currentProcess.pop_front();
+							}
+							if (currentProcess[0].getCode() == 'P')
+							{
+								pcbContainer[processIndex].setInterruptOccurred(0);
+								duration = ((clock() - start) / 
+											(double) CLOCKS_PER_SEC);
+								pcbContainer[processIndex].setProcessDuration(duration);
+								okToContinue = handleProcess(configData, readyQueue
+															 [prevFrontIndex][0],
+															pcbContainer[processIndex]);
+								pcbContainer[processIndex].setInterrupt(0);
+								pcbContainer[processIndex].setInterruptOccurred(1);
+							}
+							ableToReorder = true;
+							
+						}
+						else
+						{
+							readyQueue[0].pop_front();
+						}
+						currentProcess.pop_front();
 					}
+					else
+					{
+						
+					}
+					
+					while (reordering) {};
+				
 				}
 				else
 				{
@@ -671,6 +761,11 @@ bool runProgram(Config configData)
 		}
 	}
 	pthread_join(inputThread, NULL);
+	pthread_join(outputThread, NULL);
+	if (scheduleType == 4)
+	{
+		pthread_join(rrThread, NULL);
+	}
 	
 	int lastProcessIndex = loadedProcessIndeces[loadedProcessIndeces.size() - 1];
 		
@@ -937,7 +1032,6 @@ bool processorHandler(PCB& pData, int processTime)
 	
 	if (pData.hasBeenInterrupted())
 	{
-	
 		duration = (clock() - start) / (double) CLOCKS_PER_SEC;
 		pData.updateProcessDuration(duration);
 		pData.setInterrupt(0);
@@ -1375,6 +1469,8 @@ bool inputHandler(PCB& pData, string descriptor, int processTime)
 		pData.incrementHardDrivesUsed();
 	}
 	
+	ioIndex = pData.getpid() - 1;
+	
 	if (descriptor == "hard drive")
 	{
 	
@@ -1447,7 +1543,7 @@ bool inputHandler(PCB& pData, string descriptor, int processTime)
 bool outputHandler(PCB& pData, string descriptor, int processTime)
 {
 
-	pthread_t outputThread;
+	//pthread_t outputThread;
 	clock_t start;
 	long pTime = (long) processTime;
 	double duration;
@@ -1542,6 +1638,8 @@ bool outputHandler(PCB& pData, string descriptor, int processTime)
 	
 	}
 	
+	ioIndex = pData.getpid() - 1;
+	
 	if (descriptor == "hard drive")
 	{
 	
@@ -1590,10 +1688,10 @@ bool outputHandler(PCB& pData, string descriptor, int processTime)
 	//process is waiting
 	pData.processState = 3;
 	
-	pthread_join(outputThread, NULL);
+	//pthread_join(outputThread, NULL);
 	
 	//ending process
-	pData.processState = 1;
+	/*pData.processState = 1;
 	duration = ((clock() - start) / (double) CLOCKS_PER_SEC) - duration;
 	pData.updateProcessDuration(duration);
 	switch (outputType)
@@ -1615,7 +1713,7 @@ bool outputHandler(PCB& pData, string descriptor, int processTime)
 		default:
 			cout << "ERROR: Incorrect log type recorded from config file" << endl;
 			return 0;
-	}
+	}*/
 	
 	return 1;
 
@@ -1761,6 +1859,14 @@ void shortestTimeRemainingSchedule(deque<deque<MetaData>> processStorage,
 	{
 		//cout << "interrupt received" << endl;
 		pcbContainer[loadedProcessIndeces[0]].interrupt();
+		interruptOccurred = true;
+		for (int i = 0; i < tempLoadedProcessIndeces.size(); i++)
+		{
+			if (loadedProcessIndeces[0] == tempLoadedProcessIndeces[i])
+			{
+				prevFrontIndex = i;
+			}
+		}
 	}
 	readyQueue = tempReadyQueue;
 	loadedProcessIndeces = tempLoadedProcessIndeces;
@@ -1863,6 +1969,64 @@ void* loader(void*)
 
 }
 
+void* rrHandler(void*)
+{
+
+	pthread_t timerThread;
+	deque<MetaData> tempProcessHolder;
+	int tempIndexHolder, rc, lastIndex = 0;
+	
+	while (!waitingQueue.empty())
+	{
+	
+		rc = pthread_create(&timerThread, NULL, &timer, 
+							(void*) ((long) quantumNumber));
+		if (rc)
+		{
+			cout << "ERROR: return code from pthread_create() is " << rc << endl;
+			exit(-1);
+		}
+		pthread_join(timerThread, NULL);
+		//while (!changesHaveBeenMade);
+	
+		if (readyQueue.size() > 1)
+		{
+			//while (!ableToReorder) {};
+			int currentIndex = loadedProcessIndeces[0] + 1;
+			//cout << "check1 - " << currentIndex << " - " << lastIndex << endl;
+			
+			if (!interruptOccurred)
+			{
+			
+				cout << "check2" << endl;
+				reordering = true;
+				pcbContainer[loadedProcessIndeces[0]].interrupt();
+				interruptOccurred = true;
+				tempProcessHolder = readyQueue[0];
+				tempIndexHolder = loadedProcessIndeces[0];
+			
+				readyQueue.pop_front();
+				loadedProcessIndeces.pop_front();
+				readyQueue.push_back(tempProcessHolder);
+				loadedProcessIndeces.push_back(tempIndexHolder);
+				prevFrontIndex = loadedProcessIndeces.size() - 1;
+				reordering = false;
+			
+			}
+			
+			lastIndex = prevFrontIndex;
+			
+		}
+		else
+		{
+			cout << "check3" << endl;
+			while (readyQueue.size() <= 1) {};
+		}
+	
+	}
+
+}
+
 void* processThread(void* pTime)
 {
 
@@ -1891,7 +2055,7 @@ void* hardDriveInputHandler(void* hdTime)
 
 	sem_wait(&semaphoreHdd);
 
-	PCB process = pcbContainer[loadedProcessIndeces[0]];
+	PCB process = pcbContainer[ioIndex];
 	pthread_t timerThread;
 	clock_t start;
 	int rc, pid = process.getpid();
@@ -1969,7 +2133,7 @@ void* keyboardHandler(void* kTime)
 	
 	pthread_mutex_lock(&mutexKeyboard);
 
-	PCB process = pcbContainer[loadedProcessIndeces[0]];
+	PCB process = pcbContainer[ioIndex];
 	pthread_t timerThread;
 	clock_t start;
 	int rc, pid = process.getpid();
@@ -2049,7 +2213,7 @@ void* scannerHandler(void* sTime)
 	
 	pthread_mutex_lock(&mutexScanner);
 
-	PCB process = pcbContainer[loadedProcessIndeces[0]];
+	PCB process = pcbContainer[ioIndex];
 	pthread_t timerThread;
 	clock_t start;
 	int rc, pid = process.getpid();
@@ -2107,7 +2271,7 @@ void* scannerHandler(void* sTime)
 void* hardDriveOutputHandler(void* hdTime)
 {
 
-	pthread_t timerThread;
+	/*pthread_t timerThread;
 	int rc;
 
 	rc = pthread_create(&timerThread, NULL, &timer, (void*)hdTime);
@@ -2123,7 +2287,56 @@ void* hardDriveOutputHandler(void* hdTime)
 	
 	sem_post(&semaphoreHdd);
 	
+	pthread_join(timerThread, NULL);*/
+	
+	sem_wait(&semaphoreHdd);
+	
+	PCB process = pcbContainer[ioIndex];
+	pthread_t timerThread;
+	clock_t start;
+	int rc, pid = process.getpid();
+	double duration;
+	
+	start = clock();
+	duration = (clock() - start) / (double) CLOCKS_PER_SEC;
+	process.updateProcessDuration(duration);
+
+	rc = pthread_create(&timerThread, NULL, &timer, (void*)hdTime);
+	if (rc)
+	{
+		cout << "ERROR: return code from pthread_create() is " << rc << endl;
+		exit(-1);
+	}
+	
 	pthread_join(timerThread, NULL);
+	
+	duration = ((clock() - start) / (double) CLOCKS_PER_SEC) - duration;
+	process.updateProcessDuration(duration);
+	
+	switch (outputType)
+	{
+		case 0:
+			cout << process.getProcessDuration() << " - Process " << pid << 
+			": end hard drive output" << endl;
+		break;
+		case 1:
+			fout << process.getProcessDuration() << " - Process " << pid << 
+			": end hard drive output" << endl;
+		break;
+		case 2:
+			cout << process.getProcessDuration() << " - Process " << pid << 
+			": end hard drive output" << endl;
+			fout << process.getProcessDuration() << " - Process " << pid << 
+			": end hard drive output" << endl;
+		break;
+		default:
+			cout << "ERROR: Incorrect log type recorded from config file" << endl;
+			return 0;
+	}
+	
+	process.processState = 1;
+	
+	sem_post(&semaphoreHdd);
 
 }
 
@@ -2136,7 +2349,7 @@ void* hardDriveOutputHandler(void* hdTime)
 void* monitorHandler(void* mTime)
 {
 
-	pthread_t timerThread;
+	/*pthread_t timerThread;
 	int rc;
 
 	rc = pthread_create(&timerThread, NULL, &timer, (void*)mTime);
@@ -2152,7 +2365,56 @@ void* monitorHandler(void* mTime)
 	
 	pthread_mutex_unlock(&mutexMonitor);
 	
+	pthread_join(timerThread, NULL);*/
+	
+	pthread_mutex_lock(&mutexMonitor);
+	
+	PCB process = pcbContainer[ioIndex];
+	pthread_t timerThread;
+	clock_t start;
+	int rc, pid = process.getpid();
+	double duration;
+	
+	start = clock();
+	duration = (clock() - start) / (double) CLOCKS_PER_SEC;
+	process.updateProcessDuration(duration);
+
+	rc = pthread_create(&timerThread, NULL, &timer, (void*)mTime);
+	if (rc)
+	{
+		cout << "ERROR: return code from pthread_create() is " << rc << endl;
+		exit(-1);
+	}
+	
 	pthread_join(timerThread, NULL);
+	
+	duration = ((clock() - start) / (double) CLOCKS_PER_SEC) - duration;
+	process.updateProcessDuration(duration);
+	
+	switch (outputType)
+	{
+		case 0:
+			cout << process.getProcessDuration() << " - Process " << pid << 
+			": end monitor output" << endl;
+		break;
+		case 1:
+			fout << process.getProcessDuration() << " - Process " << pid << 
+			": end monitor output" << endl;
+		break;
+		case 2:
+			cout << process.getProcessDuration() << " - Process " << pid << 
+			": end monitor output" << endl;
+			fout << process.getProcessDuration() << " - Process " << pid << 
+			": end monitor output" << endl;
+		break;
+		default:
+			cout << "ERROR: Incorrect log type recorded from config file" << endl;
+			return 0;
+	}
+	
+	process.processState = 1;
+	
+	pthread_mutex_unlock(&mutexMonitor);
 
 }
 
@@ -2165,7 +2427,7 @@ void* monitorHandler(void* mTime)
 void* projectorHandler(void* pTime)
 {
 
-	pthread_t timerThread;
+	/*pthread_t timerThread;
 	int rc;
 
 	rc = pthread_create(&timerThread, NULL, &timer, (void*)pTime);
@@ -2180,6 +2442,55 @@ void* projectorHandler(void* pTime)
 	//further functionality will go here
 	
 	sem_post(&semaphoreProj);
+	
+	pthread_join(timerThread, NULL);*/
+	
+	sem_wait(&semaphoreProj);
+	
+	PCB process = pcbContainer[ioIndex];
+	pthread_t timerThread;
+	clock_t start;
+	int rc, pid = process.getpid();
+	double duration;
+	
+	start = clock();
+	duration = (clock() - start) / (double) CLOCKS_PER_SEC;
+	process.updateProcessDuration(duration);
+
+	rc = pthread_create(&timerThread, NULL, &timer, (void*)pTime);
+	if (rc)
+	{
+		cout << "ERROR: return code from pthread_create() is " << rc << endl;
+		exit(-1);
+	}
+	
+	pthread_join(timerThread, NULL);
+	
+	duration = ((clock() - start) / (double) CLOCKS_PER_SEC) - duration;
+	process.updateProcessDuration(duration);
+	
+	switch (outputType)
+	{
+		case 0:
+			cout << process.getProcessDuration() << " - Process " << pid << 
+			": end projector output" << endl;
+		break;
+		case 1:
+			fout << process.getProcessDuration() << " - Process " << pid << 
+			": end projector output" << endl;
+		break;
+		case 2:
+			cout << process.getProcessDuration() << " - Process " << pid << 
+			": end projector output" << endl;
+			fout << process.getProcessDuration() << " - Process " << pid << 
+			": end projector output" << endl;
+		break;
+		default:
+			cout << "ERROR: Incorrect log type recorded from config file" << endl;
+			return 0;
+	}
+	
+	process.processState = 1;
 	
 	pthread_join(timerThread, NULL);
 

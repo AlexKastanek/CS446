@@ -2,7 +2,7 @@ Start Simulator Configuration File
 Version/Phase: 5.0
 File Path: Test_5a.mdf
 Processor Quantum Number: 1
-CPU Scheduling Code: STR
+CPU Scheduling Code: RR
 Processor cycle time {msec}: 5
 Monitor display time {msec}: 22
 Hard drive cycle time {msec}: 150

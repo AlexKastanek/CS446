@@ -693,7 +693,10 @@ bool runProgram(Config configData)
 						//processIndex = loadedProcessIndeces[0];	
 						if (interruptOccurred && currentProcess[0].getCode() != 'P')
 						{
-							readyQueue[prevFrontIndex].pop_front();
+							if (!readyQueue.empty())
+							{
+								readyQueue[prevFrontIndex].pop_front();
+							}
 							currentProcess.pop_front();
 							ableToReorder = false;
 							while (!readyQueue[prevFrontIndex].empty() &&
@@ -705,7 +708,10 @@ bool runProgram(Config configData)
 								okToContinue = handleProcess(configData, readyQueue
 															 [prevFrontIndex][0],
 														    pcbContainer[processIndex]);
-								readyQueue[prevFrontIndex].pop_front();
+								if (!readyQueue.empty())
+								{
+									readyQueue[prevFrontIndex].pop_front();
+								}
 								currentProcess.pop_front();
 							}
 							if (currentProcess[0].getCode() == 'P')
@@ -725,7 +731,10 @@ bool runProgram(Config configData)
 						}
 						else
 						{
-							readyQueue[0].pop_front();
+							if (!readyQueue.empty())
+							{
+								readyQueue[0].pop_front();
+							}
 						}
 						currentProcess.pop_front();
 					}
@@ -734,7 +743,10 @@ bool runProgram(Config configData)
 						
 					}
 					
-					while (reordering) {};
+					while (reordering) 
+					{
+						//cout << "reordering" << endl;
+					}
 				
 				}
 				else
@@ -754,18 +766,25 @@ bool runProgram(Config configData)
 			if (!pcbContainer[processIndex].isInterrupted() && okToContinue)
 			{
 				//cout << "check" << endl;
-				readyQueue.pop_front();
-				loadedProcessIndeces.pop_front();
+				if (!readyQueue.empty() && !loadedProcessIndeces.empty())
+				{
+					readyQueue.pop_front();
+					loadedProcessIndeces.pop_front();
+				}
 			}
+			
+			cout << "stuck" << endl;
 
 		}
 	}
 	pthread_join(inputThread, NULL);
 	pthread_join(outputThread, NULL);
-	if (scheduleType == 4)
+	/*if (scheduleType == 4)
 	{
-		pthread_join(rrThread, NULL);
-	}
+		pthread_join(NULL);
+	}*/
+	
+	cout << "check 5" << endl;
 	
 	int lastProcessIndex = loadedProcessIndeces[loadedProcessIndeces.size() - 1];
 		
@@ -777,6 +796,8 @@ bool runProgram(Config configData)
 	handleProcess(configData, systemFinish, pcbContainer[lastProcessIndex]);
 	
 	pthread_join(loadThread, NULL);
+	
+	cout << "end" << endl;
 	
 	return 1;
 
@@ -2020,8 +2041,13 @@ void* rrHandler(void*)
 		else
 		{
 			cout << "check3" << endl;
-			while (readyQueue.size() <= 1) {};
+			while (readyQueue.size() <= 1) 
+			{
+				//cout << "check" << endl;
+			}
 		}
+		
+		cout << "check" << endl;
 	
 	}
 

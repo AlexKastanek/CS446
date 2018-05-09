@@ -1,6 +1,6 @@
 Configuration File Data
 Processor Quantum Number = 1
-CPU Scheduling Code = STR
+CPU Scheduling Code = RR
 Monitor = 22 ms/cycle
 Processor = 5 ms/cycle
 Scanner = 30 ms/cycle
@@ -30,52 +30,52 @@ O{projector}4 - 400 ms
 P{run}6 - 30 ms
 M{allocate}3 - 30 ms
 
-0.000382 - Simulator program starting
-0.000934 - OS: preparing process 1
-0.001003 - OS: starting process 1
-0.001084 - Process 1: start processing action
-0.104656 - Process 1: interrupt processing action
-0.104856 - OS: preparing process 2
-0.104905 - OS: starting process 2
-0.104953 - Process 2: start hard drive output on HDD 0
-0.105093 - End process 2
-0.105242 - Process 1: end processing action
-0.105295 - Process 1: allocating memory
-0.138339 - Process 1: memory allocated at 0x00000000
-0.138414 - End process 1
-0.235812 - OS: preparing process 3
-0.236010 - OS: starting process 3
-0.236074 - Process 3: start processing action
-0.276789 - Process 2: end hard drive output
-0.290857 - Process 3: end processing action
-0.290936 - Process 3: start keyboard input
-0.291076 - Process 3: allocating memory
-0.333877 - Process 3: memory allocated at 0x00000080
-0.333974 - Process 3: start processing action
-0.334049 - Process 3: interrupt processing action
-0.334111 - OS: preparing process 4
-0.334155 - OS: starting process 4
-0.334196 - Process 4: start hard drive input on HDD 0
-0.334308 - Process 4: start monitor output
-0.334396 - End process 4
-0.334504 - Process 3: end processing action
-0.334551 - End process 3
-0.431360 - OS: preparing process 5
-0.431486 - OS: starting process 5
-0.431541 - Process 5: start scanner input
-0.431630 - Process 5: start processing action
-0.434135 - Process 4: end monitor output
-0.547938 - Process 5: end processing action
-0.548086 - Process 5: start projector output on PROJ 0
-0.548208 - End process 5
-0.575821 - OS: preparing process 6
-0.575926 - OS: starting process 6
-0.575993 - Process 6: start processing action
-0.669344 - Process 6: end processing action
-0.669477 - Process 6: allocating memory
-0.715339 - Process 6: memory allocated at 0x00000100
-0.715443 - End process 6
-0.728257 - Process 5: end scanner input
-0.792585 - Process 4: end hard drive input
-0.953697 - Process 5: end projector output
-0.976021 - Simulator program ending
+0.000435 - Simulator program starting
+0.000900 - OS: preparing process 1
+0.000970 - OS: starting process 1
+0.001061 - Process 1: start processing action
+0.155051 - Process 1: interrupt processing action
+0.155360 - OS: preparing process 2
+0.155402 - OS: starting process 2
+0.155468 - Process 2: start hard drive output on HDD 0
+0.155633 - End process 2
+0.155772 - Process 1: end processing action
+0.155827 - Process 1: allocating memory
+0.184036 - Process 1: memory allocated at 0x00000000
+0.184166 - End process 1
+0.239368 - OS: preparing process 3
+0.239469 - OS: starting process 3
+0.239519 - Process 3: start processing action
+0.341555 - Process 3: end processing action
+0.341694 - Process 3: start keyboard input
+0.341783 - Process 3: allocating memory
+0.327029 - Process 2: end hard drive output
+0.381881 - Process 3: memory allocated at 0x00000080
+0.382033 - Process 3: start processing action
+0.382108 - Process 3: interrupt processing action
+0.382194 - OS: preparing process 4
+0.382232 - OS: starting process 4
+0.382250 - Process 4: start hard drive input on HDD 0
+0.382360 - Process 4: start monitor output
+0.382456 - End process 4
+0.382554 - Process 3: end processing action
+0.382600 - End process 3
+0.452788 - OS: preparing process 5
+0.452976 - OS: starting process 5
+0.453032 - Process 5: start scanner input
+0.453110 - Process 5: start processing action
+0.502349 - Process 4: end monitor output
+0.558612 - Process 5: end processing action
+0.560819 - Process 5: start projector output on PROJ 0
+0.560911 - End process 5
+0.572830 - OS: preparing process 6
+0.572975 - OS: starting process 6
+0.573000 - Process 6: start processing action
+0.640579 - Process 6: end processing action
+0.640687 - Process 6: allocating memory
+0.686366 - Process 6: memory allocated at 0x00000100
+0.686491 - End process 6
+0.724081 - Process 5: end scanner input
+0.862965 - Process 4: end hard drive input
+0.964913 - Process 5: end projector output
+0.979194 - Simulator program ending
